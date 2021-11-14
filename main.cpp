@@ -1,6 +1,10 @@
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include<iostream>
 #include"WinApiWindow.h"
 #include"DecoderAnimation.h"
+#include"readFile.h"
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK WndVision(HWND, UINT, WPARAM, LPARAM);
 #define BUTTON_OK 1
@@ -8,13 +12,14 @@ LRESULT CALLBACK WndVision(HWND, UINT, WPARAM, LPARAM);
 #define STATIC_POS_Y 3	
 #define PATH_OPEN_DIRECTORY 4
 #define EDIT_PATH_DIRECTORY 5
-#define EXIT 6
+#define STATUS 6
+#define EXIT 7
 IWindowCore* windowVision = nullptr;
 IWindowCore* windowChildPath = nullptr;
 bool flagVsiont = false;
 int main()
 {
-	IWindowCore* windowCore = new WinApiWindow(WHITE_BRUSH, L"Main class", L"Eбашь монтаж", 1500, 1000, WndProc);
+	IWindowCore* windowCore = new WinApiWindow(WHITE_BRUSH, L"Main class", L"BashTechnology", 1500, 1000, WndProc);
 		windowCore->Initialize();
 		windowCore->MainLoop();
 	return 0;
@@ -26,6 +31,7 @@ HWND ClassificationNeuralNetwork;
 HWND StaticNamePos_x;
 HWND StaticNamePos_y;
 HWND StaticPos_x;
+HWND ReadFile_;
 HWND StaticPos_y;
 HWND VisionChild;
 HMENU hMenuBar;
@@ -33,6 +39,7 @@ HMENU hFile;
 HMENU hExit;
 RECT clientRect;
 HGDIOBJ oldPen;
+_ReadFile readFile;
 DecoderAnimation decoderAnimation;
 int t = 0;
 HDC hDC; PAINTSTRUCT ps;
@@ -47,12 +54,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
 	//	windowVision->Initialize();
 	//	ButtonOk = CreateWindow(L"button", L"ok", WS_VISIBLE | WS_CHILD | WS_BORDER, 150, 550, 50, 20, hwnd, reinterpret_cast<HMENU>(BUTTON_OK), GetModuleHandle(nullptr), nullptr);
 		ClassificationNeuralNetwork = CreateWindow(L"static", L"Статус!", WS_VISIBLE | WS_CHILD | WS_BORDER, 150, 730, 150, 25, hwnd, nullptr, GetModuleHandle(nullptr), nullptr);
-		ClassificationNeuralNetworkStatus = CreateWindow(L"static", L"пожара нет", WS_VISIBLE | WS_CHILD | WS_BORDER, 150, 755, 150, 25, hwnd, nullptr, GetModuleHandle(nullptr), nullptr);
+		ClassificationNeuralNetworkStatus = CreateWindow(L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 150, 755, 150, 25, hwnd, nullptr, GetModuleHandle(nullptr), nullptr);
 		StaticNamePos_x = CreateWindow(L"static", L"Позиция х", WS_VISIBLE | WS_CHILD | WS_BORDER, 400, 730, 100, 25, hwnd, nullptr,GetModuleHandle(nullptr), nullptr);
 		StaticNamePos_y = CreateWindow(L"static", L"Позиция y", WS_VISIBLE | WS_CHILD | WS_BORDER, 600, 730, 100, 25, hwnd, nullptr, GetModuleHandle(nullptr), nullptr);
 		StaticPos_x = CreateWindow(L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 400, 755, 100, 25, hwnd, reinterpret_cast<HMENU>(STATIC_POS_X), GetModuleHandle(nullptr), nullptr);
 		StaticPos_y = CreateWindow(L"static", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, 600, 755, 100, 25, hwnd, reinterpret_cast<HMENU>(STATIC_POS_Y), GetModuleHandle(nullptr), nullptr);
-	
+		ReadFile_ = CreateWindow(L"button", L"загрузка файла обучения", WS_VISIBLE | WS_CHILD | WS_BORDER, 150, 800, 200, 25, hwnd, reinterpret_cast<HMENU>(STATUS), GetModuleHandle(nullptr), nullptr);
 		hMenuBar = CreateMenu();
 		hFile = CreateMenu();
 		AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hFile, L"файл");
@@ -71,7 +78,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
 			{
 			}
 			break;
-	
+		case STATUS:
+			readFile.readFile("text.txt");
+			SetWindowTextA(ClassificationNeuralNetworkStatus, readFile.getNeuralNetwokStatus().c_str());
+			return 0;
 		case EXIT:
 			PostQuitMessage(0);
 			break;
